@@ -1,0 +1,30 @@
+-- SecureMeal MySQL schema
+-- Compatible with MySQL 8+
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('hostel', 'ngo', 'admin') NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS food_listings (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  description TEXT NOT NULL,
+  quantity INT UNSIGNED NOT NULL,
+  status ENUM('available', 'claimed', 'picked') NOT NULL DEFAULT 'available',
+  expires_at DATETIME NOT NULL,
+  hostel_id INT UNSIGNED NOT NULL,
+  ngo_id INT UNSIGNED NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_food_listings_hostel
+    FOREIGN KEY (hostel_id) REFERENCES users(id)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT,
+  CONSTRAINT fk_food_listings_ngo
+    FOREIGN KEY (ngo_id) REFERENCES users(id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);
