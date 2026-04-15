@@ -41,6 +41,15 @@ body {
     linear-gradient(135deg, #e8eefc 0%, #f0fdf4 45%, #fff7ed 100%);
 }
 
+.auth-shell {
+  width: 100%;
+  max-width: 1040px;
+  display: grid;
+  grid-template-columns: minmax(320px, 460px) minmax(320px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
 .auth-card {
   width: 100%;
   max-width: 460px;
@@ -54,6 +63,53 @@ body {
 .auth-card h1 {
   margin: 0 0 14px;
   font-size: 30px;
+}
+
+.demo-card h2,
+.demo-card h3 {
+  margin: 0 0 10px;
+}
+
+.demo-section + .demo-section {
+  margin-top: 18px;
+}
+
+.demo-list {
+  display: grid;
+  gap: 10px;
+}
+
+.demo-item {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fbff;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.16s ease, box-shadow 0.2s ease;
+}
+
+.demo-item:hover {
+  transform: translateY(-1px);
+  border-color: #9db9ff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.demo-item span {
+  font-size: 13px;
+  color: #475569;
+}
+
+.demo-item-static {
+  cursor: default;
+}
+
+.demo-item-static:hover {
+  transform: none;
 }
 
 .mission-banner {
@@ -90,7 +146,8 @@ body {
 
 .auth-card input,
 .auth-card select,
-.form-grid input {
+.form-grid input,
+.form-grid select {
   width: 100%;
   margin: 8px 0;
   padding: 11px 12px;
@@ -102,7 +159,8 @@ body {
 
 .auth-card input:focus,
 .auth-card select:focus,
-.form-grid input:focus {
+.form-grid input:focus,
+.form-grid select:focus {
   outline: 2px solid #c7d7ff;
   border-color: #a8c0ff;
 }
@@ -237,6 +295,16 @@ body {
   margin: 0 0 14px;
 }
 
+.info-banner {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #eef6ff;
+  border: 1px solid #cfe0ff;
+  color: #1e3a8a;
+  font-size: 14px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 180px auto;
@@ -363,6 +431,23 @@ body {
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.04), transparent 25%),
     var(--bg);
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {

@@ -1,8 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import HostelDashboard from './pages/HostelDashboard';
-import NGODashboard from './pages/NGODashboard';
+import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -14,19 +13,10 @@ const App = () => {
       <Route path="/register" element={<Register />} />
 
       <Route
-        path="/hostel"
+        path="/student"
         element={
-          <ProtectedRoute allowedRoles={['hostel']}>
-            <HostelDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/ngo"
-        element={
-          <ProtectedRoute allowedRoles={['ngo']}>
-            <NGODashboard />
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentDashboard />
           </ProtectedRoute>
         }
       />

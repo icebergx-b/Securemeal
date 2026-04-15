@@ -16,7 +16,7 @@ app.use(express.json());
 app.use('/api', apiRoutes);
 
 app.get('/', (req, res) => {
-  res.json({ message: 'SecureMeal backend is running.' });
+  res.json({ message: 'Hostel Mess Management System backend is running.' });
 });
 
 app.use(errorHandler);
