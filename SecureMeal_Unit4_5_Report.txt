@@ -1,0 +1,584 @@
+CHAPTER 4
+
+ANALYZING THE PITFALLS, IDENTIFYING THE DEPENDENCIES, AND APPLYING NORMALIZATIONS
+
+(The relations below are prepared for the SecureMeal Hostel Mess Management System project and aligned with the schema used in Units 1, 2, and 3.)
+
+
+4.1 Analyse the Pitfalls in Relations
+
+Unnormalized Relation (Before Normalization):
+MESS_OPERATION_DETAILS(
+  student_id, student_name, dept, room_no, phone,
+  plan_type, menu_day, meal_type, food_items,
+  attendance_date, attendance_status,
+  feedback_rating, feedback_comments,
+  staff_name, staff_role
+)
+
+Before Normalization Output:
+
++------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+----------------+
+| student_id | student_name  | dept | room_no | plan_type | meal_type_values          | attendance_values             | feedback_values             | staff_name     |
++------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+----------------+
+| 101        | Aarav Sharma  | CSE  | A-101   | regular   | breakfast,lunch,dinner   | 2026-04-15-present,absent     | 5-Good,4-Needs more salad   | Mess Manager   |
+| 102        | Diya Patel    | ECE  | B-204   | veg       | breakfast,lunch          | 2026-04-15-present,present    | 4-Good breakfast            | Head Cook      |
++------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+----------------+
+
+
+Pitfall Summary Table:
+
++-------------------+----------------------------------------------------------------------------------+
+| Pitfall           | Description                                                                      |
++-------------------+----------------------------------------------------------------------------------+
+| Redundancy        | Student, plan, menu, attendance, and staff details repeat in multiple rows.      |
+| Update Anomaly    | Changing room_no, food_items, or plan_type requires updates in many tuples.      |
+| Insertion Anomaly | New student/menu/staff cannot be inserted independently without unrelated data.   |
+| Deletion Anomaly  | Deleting one attendance/feedback row may remove important master data.            |
+| Complexity        | One large relation makes querying, updating, and reporting difficult.             |
++-------------------+----------------------------------------------------------------------------------+
+
+
+4.2 First Normal Form (1NF)
+
+
+4.2.1 Identify Dependency
+Dependency Table:
+
++-------------------------------------------+----------------------------------------------+
+| Determinant                               | Dependent Attributes                         |
++-------------------------------------------+----------------------------------------------+
+| student_id                                | student_name, dept, room_no, phone          |
+| student_id                                | plan_type                                   |
+| (menu_day, meal_type)                     | food_items                                  |
+| (student_id, attendance_date, meal_type)  | attendance_status                           |
++-------------------------------------------+----------------------------------------------+
+
+
+Before Normalization:
+
++------------+---------------+---------------------------+-------------------------------+-----------------------------+
+| student_id | student_name  | meal_type_list            | attendance_list               | feedback_list               |
++------------+---------------+---------------------------+-------------------------------+-----------------------------+
+| 101        | Aarav Sharma  | breakfast,lunch,dinner   | present,absent                | 5-Good,4-Needs more salad   |
+| 102        | Diya Patel    | breakfast,lunch          | present,present               | 4-Good breakfast            |
++------------+---------------+---------------------------+-------------------------------+-----------------------------+
+
+
+After Normalization:
+
++------------+---------------+------+---------+------------+
+| student_id | name          | dept | room_no | phone      |
++------------+---------------+------+---------+------------+
+| 101        | Aarav Sharma  | CSE  | A-101   | 9876543210 |
+| 102        | Diya Patel    | ECE  | B-204   | 9876501234 |
++------------+---------------+------+---------+------------+
+
+
++---------+------------+-----------+
+| plan_id | student_id | plan_type |
++---------+------------+-----------+
+| 1       | 101        | regular   |
+| 2       | 102        | veg       |
++---------+------------+-----------+
+
+
++---------+---------+-----------+---------------------------+
+| menu_id | day     | meal_type | food_items                |
++---------+---------+-----------+---------------------------+
+| 1       | Monday  | breakfast | Poha, Banana, Tea         |
+| 2       | Monday  | lunch     | Rice, Dal, Paneer Curry   |
++---------+---------+-----------+---------------------------+
+
+
+Explanation Table:
+
++----------------------+-------------------------------------------------------------------+
+| 1NF Rule             | Application in SecureMeal                                         |
++----------------------+-------------------------------------------------------------------+
+| Atomic values only   | Removed meal lists, attendance lists, and feedback lists.         |
+| No repeating groups  | Created separate tables for student, plan, menu, and attendance. |
++----------------------+-------------------------------------------------------------------+
+
+
+4.3 Second Normal Form (2NF)
+
+
+4.3.1 Identify Dependency
+Dependency Table:
+
++-----------------------------------+--------------------------------------+
+| Key / Partial Key                 | Dependent Attributes                 |
++-----------------------------------+--------------------------------------+
+| student_id                        | student_name, dept, room_no         |
+| (student_id, date_val, meal_type) | attendance_status                    |
++-----------------------------------+--------------------------------------+
+
+
+Before Normalization:
+
++------------+------------+-----------+---------------+------+---------+---------+
+| student_id | date_val   | meal_type | student_name  | dept | room_no | status  |
++------------+------------+-----------+---------------+------+---------+---------+
+| 101        | 2026-04-15 | lunch     | Aarav Sharma  | CSE  | A-101   | present |
+| 101        | 2026-04-16 | dinner    | Aarav Sharma  | CSE  | A-101   | absent  |
++------------+------------+-----------+---------------+------+---------+---------+
+
+
+After Normalization:
+
++------------+---------------+------+---------+------------+
+| student_id | name          | dept | room_no | phone      |
++------------+---------------+------+---------+------------+
+| 101        | Aarav Sharma  | CSE  | A-101   | 9876543210 |
+| 102        | Diya Patel    | ECE  | B-204   | 9876501234 |
++------------+---------------+------+---------+------------+
+
+
++--------+------------+------------+-----------+---------+
+| att_id | student_id | date_val   | meal_type | status  |
++--------+------------+------------+-----------+---------+
+| 1      | 101        | 2026-04-15 | lunch     | present |
+| 2      | 101        | 2026-04-16 | dinner    | absent  |
++--------+------------+------------+-----------+---------+
+
+
+Explanation Table:
+
++------------------------+------------------------------------------------------------+
+| 2NF Issue              | Resolution                                                 |
++------------------------+------------------------------------------------------------+
+| Partial dependency     | Student details moved to STUDENT table.                   |
+| Fact table separation  | Attendance facts retained only in ATTENDANCE table.       |
++------------------------+------------------------------------------------------------+
+
+
+4.4 Third Normal Form (3NF)
+
+
+4.4.1 Identify Dependency
+Dependency Table:
+
++------------+----------------+
+| Determinant| Dependent      |
++------------+----------------+
+| student_id | plan_id        |
+| plan_id    | plan_type      |
++------------+----------------+
+
+
+Before Normalization:
+
++------------+---------------+------+---------+---------+-----------+
+| student_id | name          | dept | room_no | plan_id | plan_type |
++------------+---------------+------+---------+---------+-----------+
+| 101        | Aarav Sharma  | CSE  | A-101   | 1       | regular   |
+| 102        | Diya Patel    | ECE  | B-204   | 2       | veg       |
++------------+---------------+------+---------+---------+-----------+
+
+
+After Normalization:
+
++------------+---------------+------+---------+------------+
+| student_id | name          | dept | room_no | phone      |
++------------+---------------+------+---------+------------+
+| 101        | Aarav Sharma  | CSE  | A-101   | 9876543210 |
+| 102        | Diya Patel    | ECE  | B-204   | 9876501234 |
++------------+---------------+------+---------+------------+
+
+
++---------+------------+-----------+
+| plan_id | student_id | plan_type |
++---------+------------+-----------+
+| 1       | 101        | regular   |
+| 2       | 102        | veg       |
++---------+------------+-----------+
+
+
+Explanation Table:
+
++------------------------+-------------------------------------------------------------+
+| 3NF Issue              | Resolution                                                  |
++------------------------+-------------------------------------------------------------+
+| Transitive dependency  | plan_type separated through MESS_PLAN relation.            |
+| Better consistency     | Student master data is no longer mixed with plan details.  |
++------------------------+-------------------------------------------------------------+
+
+
+4.5 Boyce-Codd Normal Form (BCNF)
+
+
+4.5.1 Identify Dependency
+Dependency Table:
+
++----------------------+-------------------------------+
+| Determinant          | Dependent Attributes          |
++----------------------+-------------------------------+
+| menu_id              | day, meal_type, food_items    |
+| (day, meal_type)     | food_items                    |
++----------------------+-------------------------------+
+
+
+Before Normalization:
+
++---------+---------+-----------+---------------------------+
+| menu_id | day     | meal_type | food_items                |
++---------+---------+-----------+---------------------------+
+| 1       | Monday  | breakfast | Poha, Banana, Tea         |
+| 2       | Monday  | lunch     | Rice, Dal, Paneer Curry   |
++---------+---------+-----------+---------------------------+
+
+
+After Normalization:
+
++---------+---------+-----------+---------------------------+
+| menu_id | day     | meal_type | food_items                |
++---------+---------+-----------+---------------------------+
+| 1       | Monday  | breakfast | Poha, Banana, Tea         |
+| 2       | Monday  | lunch     | Rice, Dal, Paneer Curry   |
++---------+---------+-----------+---------------------------+
+
+
+Candidate Key Table:
+
++-------------------+------------------------------------+
+| Candidate Key     | Description                        |
++-------------------+------------------------------------+
+| menu_id           | System-generated unique key        |
+| (day, meal_type)  | Natural key for one menu slot      |
++-------------------+------------------------------------+
+
+
+Explanation Table:
+
++------------------------+-----------------------------------------------------------+
+| BCNF Condition         | SecureMeal Interpretation                                |
++------------------------+-----------------------------------------------------------+
+| Every determinant key  | day+meal_type is treated as a valid candidate key.       |
+| No anomaly remains     | One menu slot maps to one food_items value.              |
++------------------------+-----------------------------------------------------------+
+
+
+4.6 Fourth Normal Form (4NF)
+
+
+4.6.1 Identify Dependency
+Dependency Table:
+
++------------+-----------------------------------+
+| Determinant| Multi-valued Dependency           |
++------------+-----------------------------------+
+| student_id | attendance records                |
+| student_id | feedback records                  |
++------------+-----------------------------------+
+
+
+Before Normalization:
+
++------------+------------+-----------+---------+--------+-----------------------------+
+| student_id | date_val   | meal_type | status  | rating | comments                    |
++------------+------------+-----------+---------+--------+-----------------------------+
+| 101        | 2026-04-15 | lunch     | present | 5      | Lunch quality was good      |
+| 101        | 2026-04-16 | dinner    | absent  | 4      | Need more salad options     |
++------------+------------+-----------+---------+--------+-----------------------------+
+
+
+After Normalization:
+
++--------+------------+------------+-----------+---------+
+| att_id | student_id | date_val   | meal_type | status  |
++--------+------------+------------+-----------+---------+
+| 1      | 101        | 2026-04-15 | lunch     | present |
+| 2      | 101        | 2026-04-16 | dinner    | absent  |
++--------+------------+------------+-----------+---------+
+
+
++---------+------------+--------+-----------------------------+
+| feed_id | student_id | rating | comments                    |
++---------+------------+--------+-----------------------------+
+| 1       | 101        | 5      | Lunch quality was good      |
+| 2       | 101        | 4      | Need more salad options     |
++---------+------------+--------+-----------------------------+
+
+
+Explanation Table:
+
++---------------------------+-------------------------------------------------------------+
+| 4NF Issue                 | Resolution                                                  |
++---------------------------+-------------------------------------------------------------+
+| Independent multi-values  | Attendance and feedback split into separate tables.         |
+| Reduced redundancy        | Cross-combinations of attendance and feedback are avoided.  |
++---------------------------+-------------------------------------------------------------+
+
+
+4.7 Fifth Normal Form (5NF)
+
+
+4.7.1 Identify Dependency
+Join Dependency Table:
+
++----------------------+------------------------------------------------------+
+| Relation             | Role in Join Dependency                              |
++----------------------+------------------------------------------------------+
+| STUDENT              | Student master data                                  |
+| MESS_PLAN            | Plan type of student                                 |
+| MENU                 | Food served for a given day and meal                 |
+| ATTENDANCE           | Student meal attendance                              |
++----------------------+------------------------------------------------------+
+
+
+Before Normalization:
+
++------------+------------+-----------+-----------+---------------------------+---------+
+| student_id | date_val   | meal_type | plan_type | food_items                | status  |
++------------+------------+-----------+-----------+---------------------------+---------+
+| 101        | 2026-04-15 | lunch     | regular   | Rice, Dal, Paneer Curry   | present |
+| 102        | 2026-04-15 | lunch     | veg       | Rice, Dal, Paneer Curry   | present |
++------------+------------+-----------+-----------+---------------------------+---------+
+
+
+After Normalization:
+
++------------+---------------+------+---------+------------+
+| student_id | name          | dept | room_no | phone      |
++------------+---------------+------+---------+------------+
+| 101        | Aarav Sharma  | CSE  | A-101   | 9876543210 |
+| 102        | Diya Patel    | ECE  | B-204   | 9876501234 |
++------------+---------------+------+---------+------------+
+
+
++---------+------------+-----------+
+| plan_id | student_id | plan_type |
++---------+------------+-----------+
+| 1       | 101        | regular   |
+| 2       | 102        | veg       |
++---------+------------+-----------+
+
+
++---------+---------+-----------+---------------------------+
+| menu_id | day     | meal_type | food_items                |
++---------+---------+-----------+---------------------------+
+| 2       | Monday  | lunch     | Rice, Dal, Paneer Curry   |
++---------+---------+-----------+---------------------------+
+
+
++--------+------------+------------+-----------+---------+
+| att_id | student_id | date_val   | meal_type | status  |
++--------+------------+------------+-----------+---------+
+| 1      | 101        | 2026-04-15 | lunch     | present |
+| 2      | 102        | 2026-04-15 | lunch     | present |
++--------+------------+------------+-----------+---------+
+
+
+Explanation Table:
+
++------------------------+--------------------------------------------------------------+
+| 5NF Goal               | Result in SecureMeal                                         |
++------------------------+--------------------------------------------------------------+
+| Remove join dependency | Report relation reconstructed from smaller stable tables.    |
+| Final design           | Each fact is stored once in the most appropriate relation.   |
++------------------------+--------------------------------------------------------------+
+
+
+CHAPTER 5
+
+IMPLEMENTATION OF CONCURRENCY CONTROL AND RECOVERY MECHANISMS
+
+
+5.1 ACID Properties
+ACID Summary Table:
+
++------------+--------------------------------------------------------------------------------+
+| Property   | Meaning                                                                        |
++------------+--------------------------------------------------------------------------------+
+| Atomicity  | All operations in one transaction succeed together, or none are applied.       |
+| Consistency| Database moves from one valid state to another valid state.                    |
+| Isolation  | Concurrent transactions do not interfere with each other.                      |
+| Durability | Committed changes remain permanent even after failure or restart.              |
++------------+--------------------------------------------------------------------------------+
+
+
+5.2 TCL (Commit, Rollback, Savepoint)
+TCL Summary Table:
+
++------------+----------------------------------------------------------------+
+| Command    | Purpose                                                        |
++------------+----------------------------------------------------------------+
+| COMMIT     | Permanently saves all successful changes.                      |
+| ROLLBACK   | Cancels uncommitted changes and restores previous state.       |
+| SAVEPOINT  | Creates an intermediate point for partial rollback.            |
++------------+----------------------------------------------------------------+
+
+
+5.3 Minimum 5 Transactions
+
+
+5.3.1 Insert Transaction
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO STUDENT (name, dept, room_no, phone)
+    -> VALUES ('Neha Singh', 'CSE', 'A-204', '9876501111');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SET @new_student_id = LAST_INSERT_ID();
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO MESS_PLAN (student_id, plan_type)
+    -> VALUES (@new_student_id, 'veg');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0.01 sec)
+
+Result Table:
+
++------------+---------------+------+---------+------------+
+| student_id | name          | dept | room_no | phone      |
++------------+---------------+------+---------+------------+
+| 104        | Neha Singh    | CSE  | A-204   | 9876501111 |
++------------+---------------+------+---------+------------+
+
+
+5.3.2 Rollback Transaction
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO STUDENT (name, dept, room_no, phone)
+    -> VALUES ('Temp Student', 'EEE', 'D-001', '9000000000');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+Result Table:
+
++------------------------------+-------+
+| Check                        | Value |
++------------------------------+-------+
+| Temp Student rows inserted   | 0     |
++------------------------------+-------+
+
+
+5.3.3 Savepoint Transaction
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO MENU (day, meal_type, food_items)
+    -> VALUES ('Tuesday', 'breakfast', 'Idli, Sambar, Tea');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SAVEPOINT breakfast_saved;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO MENU (day, meal_type, food_items)
+    -> VALUES ('Tuesday', 'lunch', 'Rice, Dal, Paneer Curry');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> ROLLBACK TO breakfast_saved;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0.01 sec)
+
+Result Table:
+
++---------+-----------+---------------------+
+| day     | meal_type | food_items          |
++---------+-----------+---------------------+
+| Tuesday | breakfast | Idli, Sambar, Tea   |
++---------+-----------+---------------------+
+
+
+5.3.4 Update Transaction
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE MESS_PLAN
+    -> SET plan_type = 'special'
+    -> WHERE student_id = 102;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0.00 sec)
+
+Result Table:
+
++------------+-----------+
+| student_id | plan_type |
++------------+-----------+
+| 102        | special   |
++------------+-----------+
+
+
+5.3.5 Delete Transaction
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DELETE FROM FEEDBACK
+    -> WHERE feed_id = 2;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+Result Table:
+
++---------+------------+--------+-----------------------------+
+| feed_id | student_id | rating | comments                    |
++---------+------------+--------+-----------------------------+
+| 2       | 102        | 4      | Need more fruit options     |
++---------+------------+--------+-----------------------------+
+
+
+5.4 Concurrency Control
+Concurrency Control Summary Table:
+
++-------------------+------------------------------------------------------------------+
+| Topic             | Description                                                      |
++-------------------+------------------------------------------------------------------+
+| Row-level locking | Locks only the selected rows during transaction execution.       |
+| Table-level lock  | Locks the whole table when broad protection is required.         |
+| Shared lock       | Read lock; other shared reads may proceed.                      |
+| Exclusive lock    | Write lock; conflicting reads/writes are blocked.               |
++-------------------+------------------------------------------------------------------+
+
+
+Row-level locking example with terminal output:
+
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT *
+    -> FROM ATTENDANCE
+    -> WHERE student_id = 101
+    ->   AND date_val = '2026-04-15'
+    ->   AND meal_type = 'lunch'
+    -> FOR UPDATE;
++--------+------------+------------+-----------+---------+
+| att_id | student_id | date_val   | meal_type | status  |
++--------+------------+------------+-----------+---------+
+| 1      | 101        | 2026-04-15 | lunch     | present |
++--------+------------+------------+-----------+---------+
+
+1 row in set (0.00 sec)
+
+mysql> UPDATE ATTENDANCE
+    -> SET status = 'present'
+    -> WHERE student_id = 101
+    ->   AND date_val = '2026-04-15'
+    ->   AND meal_type = 'lunch';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0.00 sec)
+
+Table-level locking example with terminal output:
+
+mysql> LOCK TABLES MENU WRITE;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UNLOCK TABLES;
+Query OK, 0 rows affected (0.00 sec)

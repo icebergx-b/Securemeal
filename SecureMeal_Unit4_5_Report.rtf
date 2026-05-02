@@ -1,0 +1,410 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Times New Roman;}{\f1 Courier New;}}
+{\colortbl;\red0\green0\blue0;\red255\green255\blue255;}
+\paperw12240\paperh15840\margl1440\margr1440\margt1440\margb1440
+\fs24
+\pard\qc\b\fs30 CHAPTER 4\b0\fs24\par\par
+\pard\qc\b ANALYZING THE PITFALLS, IDENTIFYING THE DEPENDENCIES, AND APPLYING NORMALIZATIONS\b0\par\par
+\pard (The relations below are prepared for the SecureMeal Hostel Mess Management System project and aligned with the schema used in Units 1, 2, and 3.)\par
+\pard\b 4.1 Analyse the Pitfalls in Relations\b0\par
+\pard Unnormalized Relation (Before Normalization):\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_OPERATION_DETAILS(\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1   student_id, student_name, dept, room_no, phone,\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1   plan_type, menu_day, meal_type, food_items,\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1   attendance_date, attendance_status,\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1   feedback_rating, feedback_comments,\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1   staff_name, staff_role\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 )\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Sample unnormalized relation output:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | student_id | student_name  | dept | room_no | plan_type | meal_type_values          | attendance_values             | feedback_values             |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 101        | Aarav Sharma  | CSE  | A-101   | regular   | breakfast,lunch,dinner   | 2026-04-15-present,absent     | 5-Good,4-Needs more salad   |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 102        | Diya Patel    | ECE  | B-204   | veg       | breakfast,lunch          | 2026-04-15-present,present    | 4-Good breakfast            |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+-----------+---------------------------+-------------------------------+-----------------------------+\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Pitfalls:\par
+\pard\li720\fi-360 \bullet\tab Redundancy: student details, plan details, and menu details are repeated in many rows.\par
+\pard\li720\fi-360 \bullet\tab Update anomaly: if the room number or plan type changes, it must be updated in multiple tuples.\par
+\pard\li720\fi-360 \bullet\tab Insertion anomaly: a new student or a new menu cannot be inserted independently without mixing unrelated data.\par
+\pard\li720\fi-360 \bullet\tab Deletion anomaly: deleting one attendance or feedback record may also remove useful student or menu information from the same row.\par
+\pard\li720\fi-360 \bullet\tab Poor scalability: combining menu, attendance, feedback, and staff details into one table makes querying and maintenance difficult.\par
+\pard\b 4.2 First Normal Form (1NF)\b0\par
+\pard\li360\b 4.2.1 Identify Dependency\b0\par
+\pard\li720\fi-360 \bullet\tab student_id -> student_name, dept, room_no, phone\par
+\pard\li720\fi-360 \bullet\tab student_id -> plan_type (business rule: one active plan per student in the simplified academic model)\par
+\pard\li720\fi-360 \bullet\tab (menu_day, meal_type) -> food_items\par
+\pard\li720\fi-360 \bullet\tab (student_id, attendance_date, meal_type) -> attendance_status\par
+\pard\li720\fi-360 \bullet\tab student_id ->> feedback_rating, feedback_comments (multiple feedback entries over time in an unnormalized view)\par
+\pard Repeating groups identified:\par
+\pard\li720\fi-360 \bullet\tab Multiple meal values for the same student\par
+\pard\li720\fi-360 \bullet\tab Multiple attendance values for the same student and date\par
+\pard\li720\fi-360 \bullet\tab Multiple feedback details associated with the same student in a single mixed relation\par
+\pard Before 1NF:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_OPERATION_DETAILS(student_id, student_name, dept, room_no, phone, plan_type, meal_type_list, attendance_list, feedback_list)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard After 1NF (atomic values only):\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT(student_id, name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_PLAN(plan_id, student_id, plan_type)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MENU(menu_id, day, meal_type, food_items)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 ATTENDANCE(att_id, student_id, date_val, meal_type, status)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 FEEDBACK(feed_id, student_id, rating, comments)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STAFF(staff_id, name, role)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard\li360\b 4.2.2 Apply Normalization to 1NF\b0\par
+\pard\li720\fi-360 \bullet\tab Removed repeating groups and multivalued attributes from the relation.\par
+\pard\li720\fi-360 \bullet\tab Ensured that every attribute contains only a single atomic value.\par
+\pard\li720\fi-360 \bullet\tab Separated the major operational entities into independent tables.\par
+\pard\li720\fi-360 \bullet\tab Improved readability and prepared the schema for higher normal forms.\par
+\pard\b 4.3 Second Normal Form (2NF)\b0\par
+\pard\li360\b 4.3.1 Identify Dependency\b0\par
+\pard Consider the intermediate relation:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 ATTENDANCE_DETAILS(student_id, date_val, meal_type, student_name, dept, room_no, status)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Candidate composite key: (student_id, date_val, meal_type)\par
+\pard Partial dependencies:\par
+\pard\li720\fi-360 \bullet\tab student_id -> student_name, dept, room_no\par
+\pard\li720\fi-360 \bullet\tab status depends on the full key (student_id, date_val, meal_type)\par
+\pard Before 2NF output:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+------------+-----------+---------------+------+---------+---------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | student_id | date_val   | meal_type | student_name  | dept | room_no | status  |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+------------+-----------+---------------+------+---------+---------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 101        | 2026-04-15 | lunch     | Aarav Sharma  | CSE  | A-101   | present |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 101        | 2026-04-16 | dinner    | Aarav Sharma  | CSE  | A-101   | absent  |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+------------+-----------+---------------+------+---------+---------+\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard\li360\b 4.3.2 Apply Normalization to 2NF\b0\par
+\pard Decomposed into:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT(student_id, name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 ATTENDANCE(att_id, student_id, date_val, meal_type, status)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Benefits after 2NF:\par
+\pard\li720\fi-360 \bullet\tab Student information is stored once in STUDENT.\par
+\pard\li720\fi-360 \bullet\tab Attendance facts are stored separately and depend only on the attendance event.\par
+\pard\li720\fi-360 \bullet\tab Partial dependency is removed.\par
+\pard\b 4.4 Third Normal Form (3NF)\b0\par
+\pard\li360\b 4.4.1 Identify Dependency\b0\par
+\pard Consider the relation:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT_PLAN_DETAILS(student_id, name, dept, room_no, phone, plan_id, plan_type)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Functional dependencies:\par
+\pard\li720\fi-360 \bullet\tab student_id -> name, dept, room_no, phone, plan_id\par
+\pard\li720\fi-360 \bullet\tab plan_id -> plan_type\par
+\pard Here, plan_type is transitively dependent on student_id through plan_id.\par
+\pard Before 3NF output:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+---------+-----------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | student_id | name          | dept | room_no | plan_id | plan_type |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+---------+-----------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 101        | Aarav Sharma  | CSE  | A-101   | 1       | regular   |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 102        | Diya Patel    | ECE  | B-204   | 2       | veg       |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------------+---------------+------+---------+---------+-----------+\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard\li360\b 4.4.2 Apply Normalization to 3NF\b0\par
+\pard Decomposed into:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT(student_id, name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_PLAN(plan_id, student_id, plan_type)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Benefits after 3NF:\par
+\pard\li720\fi-360 \bullet\tab Transitive dependency is removed.\par
+\pard\li720\fi-360 \bullet\tab Plan information is maintained independently from core student details.\par
+\pard\li720\fi-360 \bullet\tab Changes in plan type do not require modifying student master data.\par
+\pard\b 4.5 Boyce-Codd Normal Form (BCNF)\b0\par
+\pard\li360\b 4.5.1 Identify Dependency\b0\par
+\pard Consider the scheduling relation:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MENU_SCHEDULE(menu_id, day, meal_type, food_items)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Business rule dependency:\par
+\pard\li720\fi-360 \bullet\tab (day, meal_type) -> food_items\par
+\pard\li720\fi-360 \bullet\tab menu_id -> day, meal_type, food_items\par
+\pard If both menu_id and (day, meal_type) determine food_items, then every determinant should be treated as a candidate key to satisfy BCNF.\par
+\pard\li360\b 4.5.2 Apply Normalization to BCNF\b0\par
+\pard Normalized representation:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MENU(menu_id, day, meal_type, food_items)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 UNIQUE(day, meal_type)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Explanation:\par
+\pard\li720\fi-360 \bullet\tab The pair (day, meal_type) is treated as an alternate candidate key for one menu slot.\par
+\pard\li720\fi-360 \bullet\tab This removes ambiguity in storing multiple different menus for the same day and meal type.\par
+\pard\li720\fi-360 \bullet\tab Every determinant now behaves as a candidate key under the project rule.\par
+\pard\b 4.6 Fourth Normal Form (4NF)\b0\par
+\pard\li360\b 4.6.1 Identify Dependency\b0\par
+\pard Consider a combined activity relation:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT_ACTIVITY(student_id, date_val, meal_type, status, rating, comments)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Independent multivalued facts:\par
+\pard\li720\fi-360 \bullet\tab student_id ->> attendance records\par
+\pard\li720\fi-360 \bullet\tab student_id ->> feedback records\par
+\pard Attendance data and feedback data are independent multivalued attributes of the same student.\par
+\pard\li360\b 4.6.2 Apply Normalization to 4NF\b0\par
+\pard Decomposed into:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 ATTENDANCE(att_id, student_id, date_val, meal_type, status)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 FEEDBACK(feed_id, student_id, rating, comments)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Benefits after 4NF:\par
+\pard\li720\fi-360 \bullet\tab Attendance and feedback are separated into independent relations.\par
+\pard\li720\fi-360 \bullet\tab Redundant combinations of attendance rows and feedback rows are avoided.\par
+\pard\li720\fi-360 \bullet\tab Multi-valued dependency is removed.\par
+\pard\b 4.7 Fifth Normal Form (5NF)\b0\par
+\pard\li360\b 4.7.1 Identify Dependency\b0\par
+\pard Consider a reporting relation prepared for analysis:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_DAILY_REPORT(student_id, date_val, meal_type, plan_type, food_items, status)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard This relation can be reconstructed through joins from independently maintained tables:\par
+\pard\li720\fi-360 \bullet\tab STUDENT and MESS_PLAN\par
+\pard\li720\fi-360 \bullet\tab MENU(day, meal_type, food_items)\par
+\pard\li720\fi-360 \bullet\tab ATTENDANCE(student_id, date_val, meal_type, status)\par
+\pard The report relation contains a join dependency because it is generated by combining student, plan, menu, and attendance relations.\par
+\pard\li360\b 4.7.2 Apply Normalization to 5NF\b0\par
+\pard Final 5NF design for the project:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STUDENT(student_id, name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 STAFF(staff_id, name, role)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MESS_PLAN(plan_id, student_id, plan_type)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 MENU(menu_id, day, meal_type, food_items)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 ATTENDANCE(att_id, student_id, date_val, meal_type, status)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 FEEDBACK(feed_id, student_id, rating, comments)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Result:\par
+\pard\li720\fi-360 \bullet\tab No non-trivial join dependency remains in the final operational design.\par
+\pard\li720\fi-360 \bullet\tab Each table captures one clear entity or relationship.\par
+\pard\li720\fi-360 \bullet\tab The schema is easy to maintain, query, and extend.\par
+\pard\qc\b\fs30 CHAPTER 5\b0\fs24\par\par
+\pard\qc\b IMPLEMENTATION OF CONCURRENCY CONTROL AND RECOVERY MECHANISMS\b0\par\par
+\pard\b 5.1 Introduction to Transactions\b0\par
+\pard\li360\b 5.1.1 Properties of Transactions\b0\par
+\pard\li720\fi-360 \bullet\tab Atomicity: all operations inside a transaction are completed together, or none of them are applied.\par
+\pard\li720\fi-360 \bullet\tab Consistency: a transaction moves the database from one valid state to another valid state.\par
+\pard\li720\fi-360 \bullet\tab Isolation: one transaction does not interfere with another concurrent transaction.\par
+\pard\li720\fi-360 \bullet\tab Durability: once committed, the changes remain permanent even after failure or restart.\par
+\pard\li360\b 5.1.2 States of a Transaction\b0\par
+\pard\li720\fi-360 \bullet\tab Active: transaction is currently executing.\par
+\pard\li720\fi-360 \bullet\tab Partially committed: all statements are executed, but commit is not yet finalized.\par
+\pard\li720\fi-360 \bullet\tab Committed: transaction has completed successfully and changes are permanent.\par
+\pard\li720\fi-360 \bullet\tab Failed: transaction could not complete because of an error or interruption.\par
+\pard\li720\fi-360 \bullet\tab Aborted: all changes are rolled back and the database returns to the earlier consistent state.\par
+\pard\b 5.2 Transaction Control Language (TCL)\b0\par
+\pard\li360\b 5.2.1 SAVEPOINT\b0\par
+\pard SAVEPOINT is used to create an intermediate point inside a transaction. The database can roll back to that point without cancelling the entire transaction.\par
+\pard\li360\b 5.2.2 COMMIT\b0\par
+\pard COMMIT permanently saves all changes performed by the current transaction.\par
+\pard\li360\b 5.2.3 ROLLBACK\b0\par
+\pard ROLLBACK cancels uncommitted changes. It can also be used with SAVEPOINT to partially undo work.\par
+\pard\b 5.3 Five Transactions Executed for the SecureMeal Project\b0\par
+\pard\li360\b 5.3.1 Transaction 1: Register a new student and assign a mess plan\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO STUDENT (name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES ('Neha Singh', 'CSE', 'A-204', '9876501111');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.01 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> SET @new_student_id = LAST_INSERT_ID();\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO MESS_PLAN (student_id, plan_type)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES (@new_student_id, 'veg');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> COMMIT;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.01 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: Student record and corresponding mess plan are inserted successfully.\par
+\pard\li360\b 5.3.2 Transaction 2: Cancel a mistaken registration using ROLLBACK\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO STUDENT (name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES ('Temp Student', 'EEE', 'D-001', '9000000000');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> ROLLBACK;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: No new student is stored because the transaction is rolled back.\par
+\pard\li360\b 5.3.3 Transaction 3: Use SAVEPOINT while updating the menu\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO MENU (day, meal_type, food_items)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES ('Tuesday', 'breakfast', 'Idli, Sambar, Tea');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.01 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> SAVEPOINT breakfast_saved;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO MENU (day, meal_type, food_items)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES ('Tuesday', 'lunch', 'Rice, Dal, Paneer Curry');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> ROLLBACK TO breakfast_saved;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> COMMIT;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.01 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: Tuesday breakfast menu is saved, but the lunch entry is cancelled.\par
+\pard\li360\b 5.3.4 Transaction 4: Mark attendance and submit feedback together\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO ATTENDANCE (student_id, date_val, meal_type, status)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES (101, '2026-04-15', 'lunch', 'present');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO FEEDBACK (student_id, rating, comments)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES (101, 5, 'Lunch quality was good and the service was quick');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> COMMIT;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.01 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: Both attendance and feedback are stored successfully in one atomic unit.\par
+\pard\li360\b 5.3.5 Transaction 5: Roll back an incorrect plan update and feedback deletion\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> UPDATE MESS_PLAN\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> SET plan_type = 'special'\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> WHERE student_id = 102;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Rows matched: 1  Changed: 1  Warnings: 0\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> DELETE FROM FEEDBACK\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> WHERE feed_id = 2;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> ROLLBACK;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: The original plan and feedback records remain unchanged after rollback.\par
+\pard\b 5.4 Concurrency Control\b0\par
+\pard\li360\b 5.4.1 Concurrency Control Algorithms Used / Discussed\b0\par
+\pard\li720\fi-360 \bullet\tab Lock-based protocol: records are locked before update so that conflicting operations cannot happen at the same time.\par
+\pard\li720\fi-360 \bullet\tab Two-phase locking (2PL): a transaction first acquires all required locks and then releases them after finishing the update phase.\par
+\pard\li720\fi-360 \bullet\tab Row-level locking: only the selected rows are locked, which improves concurrency.\par
+\pard\li720\fi-360 \bullet\tab Table-level locking: the whole table is locked when broader protection is needed for administrative operations.\par
+\pard\li360\b 5.4.2 Example for the SecureMeal Project\b0\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> SELECT *\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> FROM ATTENDANCE\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> WHERE student_id = 101\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     ->   AND date_val = '2026-04-15'\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     ->   AND meal_type = 'lunch'\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> FOR UPDATE;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +--------+------------+------------+-----------+---------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | att_id | student_id | date_val   | meal_type | status  |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +--------+------------+------------+-----------+---------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 1      | 101        | 2026-04-15 | lunch     | present |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +--------+------------+------------+-----------+---------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 1 row in set (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> UPDATE ATTENDANCE\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> SET status = 'present'\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> WHERE student_id = 101\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     ->   AND date_val = '2026-04-15'\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     ->   AND meal_type = 'lunch';\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Rows matched: 1  Changed: 0  Warnings: 0\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> COMMIT;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Output: The selected attendance row is locked during the transaction, preventing conflicting concurrent updates.\par
+\pard Table-level locking example:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> LOCK TABLES MENU WRITE;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> UNLOCK TABLES;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard\b 5.5 Recovery Mechanisms\b0\par
+\pard\li360\b 5.5.1 Recovery Techniques Relevant to the Project\b0\par
+\pard\li720\fi-360 \bullet\tab Write-ahead logging (WAL): changes are written to the log before they are written permanently to the database.\par
+\pard\li720\fi-360 \bullet\tab Undo operation: uncommitted changes are reversed after failure.\par
+\pard\li720\fi-360 \bullet\tab Redo operation: committed changes are restored during recovery if needed.\par
+\pard\li720\fi-360 \bullet\tab Checkpointing: periodic checkpoints reduce recovery time by limiting how far the log must be scanned.\par
+\pard\li720\fi-360 \bullet\tab Backup and restore: logical or physical backups can restore the database in severe failure situations.\par
+\pard\li360\b 5.5.2 Recovery Example for SecureMeal\b0\par
+\pard Suppose an admin starts registering a new student and assigning a plan, but the system crashes before COMMIT.\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> START TRANSACTION;\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO STUDENT (name, dept, room_no, phone)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES ('Riya Das', 'IT', 'C-118', '9811112233');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> SET @sid = LAST_INSERT_ID();\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 0 rows affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 mysql> INSERT INTO MESS_PLAN (student_id, plan_type)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1     -> VALUES (@sid, 'regular');\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 Query OK, 1 row affected (0.00 sec)\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 \cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 -- System failure occurs here before COMMIT\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Recovery actions and results:\par
+\trowd\trgaph108\trleft0\trqc\trrh0\clcbpat1\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx9500
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------+----------------------------------------------------+---------------------------------------------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | Step | Recovery Action                                    | Result                                      |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------+----------------------------------------------------+---------------------------------------------+\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 1    | DBMS checks the transaction log after restart      | Failure point is identified                 |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 2    | Uncommitted transaction is marked incomplete       | Transaction is not treated as successful    |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 3    | UNDO is applied to partial inserts                 | No half-saved student or plan remains       |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 | 4    | Database returns to the last consistent state      | Data integrity is preserved                 |\cf0\cb0\f0\cell
+\pard\intbl\li120\ri120\sb40\sa40\cf2\cb1\f1 +------+----------------------------------------------------+---------------------------------------------+\cf0\cb0\f0\cell
+\row
+\pard\par
+\pard Conclusion: because COMMIT was not executed, the partially inserted data is undone during recovery, preserving consistency.\par
+\pard\b 5.6 Conclusion of Chapter 5\b0\par
+\pard The SecureMeal project demonstrates how transactions, TCL commands, locking, and recovery mechanisms maintain correctness in a multi-user DBMS environment. Atomic operations such as student registration, menu updates, attendance marking, and feedback submission can be controlled safely using COMMIT, ROLLBACK, SAVEPOINT, and locks. Recovery mechanisms ensure that accidental failures do not leave the database in an inconsistent state.\par
+}
