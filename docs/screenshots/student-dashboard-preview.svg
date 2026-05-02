@@ -1,0 +1,33 @@
+<svg width="1400" height="840" viewBox="0 0 1400 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="840" rx="28" fill="#F3F6FB"/>
+  <rect x="40" y="40" width="1320" height="760" rx="28" fill="#FFFFFF"/>
+  <rect x="80" y="84" width="1240" height="98" rx="24" fill="#ECFDF5"/>
+  <text x="116" y="128" fill="#166534" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="3">STUDENT EXPERIENCE</text>
+  <text x="116" y="172" fill="#0F172A" font-size="34" font-family="Arial, Helvetica, sans-serif" font-weight="700">Mess Menu, Attendance, and Feedback</text>
+
+  <rect x="80" y="220" width="770" height="250" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="108" y="264" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Mess Menu</text>
+  <rect x="108" y="298" width="714" height="50" rx="14" fill="#F8FAFC"/>
+  <text x="130" y="330" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Day</text>
+  <text x="264" y="330" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Meal</text>
+  <text x="418" y="330" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Food Items</text>
+  <text x="130" y="388" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Monday</text>
+  <text x="264" y="388" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Lunch</text>
+  <text x="418" y="388" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Rice, Dal, Paneer Curry, Salad</text>
+
+  <rect x="884" y="220" width="436" height="250" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="914" y="264" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Attendance Status</text>
+  <circle cx="978" cy="364" r="54" fill="#DBEAFE"/>
+  <text x="947" y="374" fill="#0F172A" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="700">91%</text>
+  <text x="1068" y="350" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif">Current trend</text>
+  <text x="1068" y="390" fill="#0F172A" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">Present</text>
+
+  <rect x="80" y="506" width="1240" height="244" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="108" y="550" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Feedback Form</text>
+  <rect x="108" y="584" width="240" height="56" rx="16" fill="#F8FAFC"/>
+  <rect x="374" y="584" width="640" height="56" rx="16" fill="#F8FAFC"/>
+  <rect x="1040" y="584" width="236" height="56" rx="16" fill="#0F4CC9"/>
+  <text x="136" y="619" fill="#475569" font-size="18" font-family="Arial, Helvetica, sans-serif">Rating: 5</text>
+  <text x="402" y="619" fill="#475569" font-size="18" font-family="Arial, Helvetica, sans-serif">Comments: Food quality is good and service is fast.</text>
+  <text x="1096" y="619" fill="white" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Submit Feedback</text>
+</svg>

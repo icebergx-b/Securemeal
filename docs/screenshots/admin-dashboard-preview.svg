@@ -1,0 +1,51 @@
+<svg width="1400" height="840" viewBox="0 0 1400 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="840" rx="28" fill="#F3F6FB"/>
+  <rect x="40" y="40" width="1320" height="760" rx="28" fill="#FFFFFF"/>
+  <rect x="80" y="84" width="1240" height="92" rx="24" fill="#EEF4FF"/>
+  <text x="116" y="128" fill="#0F172A" font-size="36" font-family="Arial, Helvetica, sans-serif" font-weight="700">Admin Dashboard</text>
+  <text x="116" y="160" fill="#475569" font-size="18" font-family="Arial, Helvetica, sans-serif">Operations, attendance overview, menu management, and feedback review</text>
+
+  <rect x="80" y="216" width="280" height="140" rx="24" fill="#DBEAFE"/>
+  <rect x="390" y="216" width="280" height="140" rx="24" fill="#DCFCE7"/>
+  <rect x="700" y="216" width="280" height="140" rx="24" fill="#FEF3C7"/>
+  <rect x="1010" y="216" width="310" height="140" rx="24" fill="#E2E8F0"/>
+
+  <text x="108" y="258" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif">Students Registered</text>
+  <text x="108" y="320" fill="#0F172A" font-size="50" font-family="Arial, Helvetica, sans-serif" font-weight="700">24</text>
+  <text x="418" y="258" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif">Attendance Today</text>
+  <text x="418" y="320" fill="#0F172A" font-size="50" font-family="Arial, Helvetica, sans-serif" font-weight="700">91%</text>
+  <text x="728" y="258" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif">Menu Items</text>
+  <text x="728" y="320" fill="#0F172A" font-size="50" font-family="Arial, Helvetica, sans-serif" font-weight="700">18</text>
+  <text x="1038" y="258" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif">Feedback Signals</text>
+  <text x="1038" y="320" fill="#0F172A" font-size="50" font-family="Arial, Helvetica, sans-serif" font-weight="700">42</text>
+
+  <rect x="80" y="390" width="470" height="360" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="108" y="434" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Attendance Summary</text>
+  <polyline points="116,676 196,618 276,642 356,540 436,574 516,494" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="196" cy="618" r="8" fill="#2563EB"/>
+  <circle cx="276" cy="642" r="8" fill="#2563EB"/>
+  <circle cx="356" cy="540" r="8" fill="#2563EB"/>
+  <circle cx="436" cy="574" r="8" fill="#2563EB"/>
+  <circle cx="516" cy="494" r="8" fill="#2563EB"/>
+
+  <rect x="580" y="390" width="740" height="360" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="608" y="434" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Feedback Table</text>
+  <rect x="608" y="470" width="684" height="54" rx="14" fill="#F8FAFC"/>
+  <text x="628" y="504" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">ID</text>
+  <text x="706" y="504" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Student</text>
+  <text x="930" y="504" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Dept</text>
+  <text x="1060" y="504" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Rating</text>
+  <text x="1178" y="504" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">Comment</text>
+
+  <text x="628" y="570" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">1</text>
+  <text x="706" y="570" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Aarav Sharma</text>
+  <text x="930" y="570" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">CSE</text>
+  <text x="1060" y="570" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">5</text>
+  <text x="1178" y="570" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Food quality is good</text>
+
+  <text x="628" y="626" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">2</text>
+  <text x="706" y="626" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Diya Patel</text>
+  <text x="930" y="626" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">ECE</text>
+  <text x="1060" y="626" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">4</text>
+  <text x="1178" y="626" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Need more fruit options</text>
+</svg>

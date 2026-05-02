@@ -1,0 +1,60 @@
+<svg width="1600" height="760" viewBox="0 0 1600 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="1450" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF2FF"/>
+      <stop offset="0.55" stop-color="#F3FFF7"/>
+      <stop offset="1" stop-color="#FFF7ED"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFFFFF" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.78"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0F4CC9"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="1600" height="760" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="760" rx="32" fill="url(#bg)"/>
+  <circle cx="1380" cy="120" r="150" fill="#BFDBFE" fill-opacity="0.45"/>
+  <circle cx="180" cy="110" r="130" fill="#BBF7D0" fill-opacity="0.38"/>
+  <circle cx="1300" cy="650" r="180" fill="#FED7AA" fill-opacity="0.35"/>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="82" width="1456" height="596" rx="34" fill="url(#card)"/>
+  </g>
+
+  <text x="120" y="170" fill="#1D4ED8" font-size="20" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="4">SMART HOSTEL + MESS INTELLIGENCE PLATFORM</text>
+  <text x="120" y="250" fill="#0F172A" font-size="64" font-family="Arial, Helvetica, sans-serif" font-weight="700">SecureMeal</text>
+  <text x="120" y="304" fill="#334155" font-size="28" font-family="Arial, Helvetica, sans-serif">A DBMS-ready hostel mess system with admin workflows, analytics, and a live SQL lab.</text>
+
+  <rect x="120" y="360" width="230" height="120" rx="24" fill="url(#blue)"/>
+  <text x="148" y="404" fill="#DBEAFE" font-size="16" font-family="Arial, Helvetica, sans-serif">Students</text>
+  <text x="148" y="452" fill="white" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="700">20+</text>
+
+  <rect x="372" y="360" width="230" height="120" rx="24" fill="#FFFFFF"/>
+  <text x="400" y="404" fill="#475569" font-size="16" font-family="Arial, Helvetica, sans-serif">Modules</text>
+  <text x="400" y="452" fill="#0F172A" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="700">DB Lab</text>
+
+  <rect x="624" y="360" width="230" height="120" rx="24" fill="#FFFFFF"/>
+  <text x="652" y="404" fill="#475569" font-size="16" font-family="Arial, Helvetica, sans-serif">Database</text>
+  <text x="652" y="452" fill="#0F172A" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="700">MySQL</text>
+
+  <rect x="916" y="170" width="520" height="360" rx="28" fill="#09111F"/>
+  <rect x="952" y="214" width="210" height="18" rx="9" fill="#1E3A8A"/>
+  <rect x="1188" y="214" width="120" height="18" rx="9" fill="#334155"/>
+  <rect x="952" y="264" width="448" height="56" rx="18" fill="#0F172A" stroke="#1E293B"/>
+  <text x="980" y="300" fill="#DBEAFE" font-size="18" font-family="Courier New, monospace">SELECT * FROM STUDENT_SUMMARY;</text>
+
+  <rect x="952" y="346" width="448" height="138" rx="18" fill="#111827" stroke="#1E293B"/>
+  <text x="972" y="382" fill="#93C5FD" font-size="16" font-family="Courier New, monospace">student_id | name         | plan_type</text>
+  <text x="972" y="414" fill="#F8FAFC" font-size="16" font-family="Courier New, monospace">101        | Aarav Sharma | regular</text>
+  <text x="972" y="446" fill="#F8FAFC" font-size="16" font-family="Courier New, monospace">102        | Diya Patel   | veg</text>
+  <text x="972" y="478" fill="#F8FAFC" font-size="16" font-family="Courier New, monospace">103        | Rohan Verma  | special</text>
+
+  <rect x="120" y="548" width="280" height="56" rx="16" fill="#0F4CC9"/>
+  <text x="152" y="584" fill="white" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">Admin, Student, SQL Demo</text>
+</svg>

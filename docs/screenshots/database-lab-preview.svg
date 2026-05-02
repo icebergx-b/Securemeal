@@ -1,0 +1,40 @@
+<svg width="1400" height="860" viewBox="0 0 1400 860" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="860" rx="28" fill="#F3F6FB"/>
+  <rect x="40" y="40" width="1320" height="780" rx="28" fill="#FFFFFF"/>
+  <rect x="80" y="84" width="1240" height="110" rx="26" fill="#EEF4FF"/>
+  <text x="118" y="132" fill="#1D4ED8" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="3">DATABASE LAB MODE</text>
+  <text x="118" y="176" fill="#0F172A" font-size="34" font-family="Arial, Helvetica, sans-serif" font-weight="700">Safe SQL Playground + Live Query Demo</text>
+
+  <rect x="80" y="228" width="760" height="540" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="108" y="272" fill="#0F172A" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">SQL Playground</text>
+  <rect x="108" y="300" width="704" height="210" rx="20" fill="#09111F"/>
+  <text x="134" y="350" fill="#93C5FD" font-size="18" font-family="Courier New, monospace">SELECT s.student_id, s.name, mp.plan_type</text>
+  <text x="134" y="386" fill="#93C5FD" font-size="18" font-family="Courier New, monospace">FROM STUDENT s</text>
+  <text x="134" y="422" fill="#93C5FD" font-size="18" font-family="Courier New, monospace">LEFT JOIN MESS_PLAN mp ON mp.student_id = s.student_id</text>
+  <text x="134" y="458" fill="#93C5FD" font-size="18" font-family="Courier New, monospace">ORDER BY s.student_id;</text>
+
+  <rect x="108" y="542" width="704" height="194" rx="20" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="134" y="584" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">student_id</text>
+  <text x="292" y="584" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">name</text>
+  <text x="526" y="584" fill="#334155" font-size="18" font-family="Arial, Helvetica, sans-serif" font-weight="700">plan_type</text>
+  <text x="134" y="636" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">101</text>
+  <text x="292" y="636" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Aarav Sharma</text>
+  <text x="526" y="636" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">regular</text>
+  <text x="134" y="682" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">102</text>
+  <text x="292" y="682" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">Diya Patel</text>
+  <text x="526" y="682" fill="#0F172A" font-size="18" font-family="Arial, Helvetica, sans-serif">veg</text>
+
+  <rect x="874" y="228" width="446" height="246" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="904" y="272" fill="#0F172A" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Prebuilt Queries</text>
+  <rect x="904" y="304" width="386" height="52" rx="16" fill="#F8FAFC"/>
+  <rect x="904" y="372" width="386" height="52" rx="16" fill="#F8FAFC"/>
+  <text x="926" y="336" fill="#0F172A" font-size="17" font-family="Arial, Helvetica, sans-serif">Students with mess plans</text>
+  <text x="926" y="404" fill="#0F172A" font-size="17" font-family="Arial, Helvetica, sans-serif">Attendance percentage calculation</text>
+
+  <rect x="874" y="498" width="446" height="270" rx="24" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="904" y="542" fill="#0F172A" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Live Logs</text>
+  <rect x="904" y="576" width="386" height="62" rx="16" fill="#F8FAFC"/>
+  <rect x="904" y="654" width="386" height="62" rx="16" fill="#F8FAFC"/>
+  <text x="926" y="610" fill="#0F172A" font-size="16" font-family="Arial, Helvetica, sans-serif">SUCCESS - SELECT * FROM STUDENT</text>
+  <text x="926" y="688" fill="#0F172A" font-size="16" font-family="Arial, Helvetica, sans-serif">DEMO - CALL revenue_breakdown()</text>
+</svg>

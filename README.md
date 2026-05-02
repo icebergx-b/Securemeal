@@ -1,25 +1,87 @@
 # SecureMeal
 
-SecureMeal is a full-stack hostel mess management system built for DBMS-style academic demonstration and local deployment. It includes student and admin workflows, MySQL-backed APIs, demo fallback mode, and a Database Lab screen for live SQL showcase.
+<p align="center">
+  <img src="./docs/screenshots/securemeal-cover.svg" alt="SecureMeal cover" width="100%" />
+</p>
 
-## Features
+<p align="center">
+  <strong>A hostel mess management system with live admin workflows, DBMS-friendly schema design, and an interactive SQL lab mode.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61dafb?style=for-the-badge&logo=react&logoColor=0b1220" alt="React and Vite badge" />
+  <img src="https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-1f2937?style=for-the-badge&logo=node.js&logoColor=8cc84b" alt="Node and Express badge" />
+  <img src="https://img.shields.io/badge/Database-MySQL-0f4cc9?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL badge" />
+  <img src="https://img.shields.io/badge/Mode-Demo%20Fallback-15803d?style=for-the-badge" alt="Demo fallback badge" />
+</p>
+
+## Overview
+
+SecureMeal is a full-stack hostel mess management system built for academic DBMS demonstration and practical web app showcase. It supports student and admin workflows, MySQL-backed APIs, demo fallback mode, and a Database Lab screen for live SQL demonstrations.
+
+It is designed to be:
+
+- easy to run locally
+- clear enough for viva explanation
+- strong enough to showcase tables, triggers, views, procedures, and analytics ideas
+
+## Highlights
 
 - Student registration with generated student ID
-- Student login and admin login
-- Mess menu management
-- Attendance marking and attendance summary
-- Feedback submission and review
-- Demo-ready fallback mode when MySQL is unavailable
-- Database Lab Mode for safe SQL demo queries
-- Enterprise SQL blueprint with advanced tables, triggers, views, and procedures
+- Student and admin login flows
+- Menu management, attendance marking, and feedback tracking
+- Demo-ready backend fallback when MySQL is unavailable
+- Admin-only Database Lab Mode for safe query execution
+- Enterprise SQL blueprint with advanced schema, triggers, views, and procedures
+
+## Screenshots
+
+### Platform Overview
+
+![SecureMeal Admin Dashboard](./docs/screenshots/admin-dashboard-preview.svg)
+
+### Database Lab Mode
+
+![SecureMeal Database Lab](./docs/screenshots/database-lab-preview.svg)
+
+### Student Experience
+
+![SecureMeal Student Dashboard](./docs/screenshots/student-dashboard-preview.svg)
 
 ## Tech Stack
 
-- Frontend: React + Vite
-- Backend: Node.js + Express
-- Database: MySQL
-- HTTP Client: Axios
-- Styling: Plain CSS
+| Layer | Stack |
+| --- | --- |
+| Frontend | React, Vite, Axios, React Router |
+| Backend | Node.js, Express |
+| Database | MySQL, `mysql2/promise` |
+| Styling | Plain CSS |
+| Demo Layer | In-memory fallback store |
+
+## Core Modules
+
+### Student Module
+
+- register new students
+- login with student ID
+- view menu
+- mark attendance
+- submit feedback
+
+### Admin Module
+
+- add menu items
+- inspect student attendance
+- review feedback
+- open Database Lab Mode
+
+### Database Lab Mode
+
+- run safe SQL queries
+- inspect execution plans with `EXPLAIN`
+- use prebuilt demo queries
+- trigger procedure demos
+- inspect recent query and trigger logs
 
 ## Project Structure
 
@@ -36,6 +98,8 @@ SecureMeal/
 │   ├── demoStore.js
 │   ├── schema.sql
 │   └── server.js
+├── docs/
+│   └── screenshots/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
@@ -46,7 +110,7 @@ SecureMeal/
 └── README.md
 ```
 
-## Local Setup
+## Quick Start
 
 ### 1. Start the backend
 
@@ -56,7 +120,7 @@ npm install
 node server.js
 ```
 
-Backend runs at:
+Backend:
 
 ```text
 http://localhost:5000
@@ -70,15 +134,21 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
+Frontend:
 
 ```text
 http://localhost:5173
 ```
 
+### 3. Open the app
+
+- Student/Admin app: [http://localhost:5173](http://localhost:5173)
+- Health check: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- Database Lab Mode: [http://localhost:5173/lab](http://localhost:5173/lab)
+
 ## Environment Variables
 
-Create a `.env` file inside `backend/` using:
+Create `backend/.env` using:
 
 ```env
 PORT=5000
@@ -90,14 +160,14 @@ DB_NAME=securemeal
 
 ## Demo Login
 
-Use these demo accounts from the login screen:
+Use these demo accounts from the login page:
 
 - Student: `Aarav Sharma` with ID `101`
 - Student: `Diya Patel` with ID `102`
 - Student: `Rohan Verma` with ID `103`
 - Admin: `Mess Admin`
 
-## Database Lab Mode
+## Database Lab Usage
 
 After logging in as admin, open:
 
@@ -105,16 +175,7 @@ After logging in as admin, open:
 http://localhost:5173/lab
 ```
 
-This screen supports:
-
-- Safe SQL playground
-- Prebuilt demo queries
-- Procedure demo buttons
-- Query result tables
-- Basic result visualization
-- Query logs and trigger activity panel
-
-Allowed query types:
+Supported safe query types:
 
 - `SELECT`
 - `SHOW`
@@ -122,13 +183,32 @@ Allowed query types:
 - `EXPLAIN`
 - approved `CALL`
 
+Example queries:
+
+```sql
+SELECT s.student_id, s.name, s.dept, mp.plan_type
+FROM STUDENT s
+LEFT JOIN MESS_PLAN mp ON mp.student_id = s.student_id
+ORDER BY s.student_id;
+```
+
+```sql
+SELECT student_id, date_val, meal_type, status
+FROM ATTENDANCE
+ORDER BY date_val DESC;
+```
+
+```sql
+EXPLAIN SELECT * FROM STUDENT;
+```
+
 ## Enterprise SQL Blueprint
 
-The advanced database showcase file is located at:
+The advanced database showcase file is:
 
-[`backend/sql/enterprise_blueprint.sql`](/Users/priyanshupanda/Documents/Motivss/SecureMeal/backend/sql/enterprise_blueprint.sql)
+[`backend/sql/enterprise_blueprint.sql`](./backend/sql/enterprise_blueprint.sql)
 
-Load it into MySQL with:
+Load it in MySQL:
 
 ```bash
 mysql -u root -p
@@ -140,21 +220,34 @@ Then inside MySQL:
 SOURCE /Users/priyanshupanda/Documents/Motivss/SecureMeal/backend/sql/enterprise_blueprint.sql;
 ```
 
-This creates a separate database:
+This creates a separate showcase database:
 
 ```text
 securemeal_enterprise
 ```
 
-## Useful Commands
+Useful commands:
 
-Show backend health:
+```sql
+USE securemeal_enterprise;
+SHOW TABLES;
+SHOW TRIGGERS;
+SHOW FULL TABLES WHERE Table_type = 'VIEW';
+SHOW PROCEDURE STATUS WHERE Db = 'securemeal_enterprise';
+CALL revenue_breakdown();
+CALL inventory_forecast();
+CALL detect_irregular_attendance();
+```
+
+## Useful Development Commands
+
+Check backend health:
 
 ```bash
 curl http://localhost:5000/api/health
 ```
 
-Show menu API:
+Check menu API:
 
 ```bash
 curl http://localhost:5000/api/menu
@@ -169,7 +262,7 @@ npm run migrate
 
 ## GitHub Update Flow
 
-Whenever you make changes:
+Whenever you change the project:
 
 ```bash
 cd /Users/priyanshupanda/Documents/Motivss/SecureMeal
@@ -181,6 +274,6 @@ git push
 
 ## Notes
 
-- The main working app uses the `securemeal` database.
-- The advanced DBMS showcase uses `securemeal_enterprise`.
-- Demo fallback mode helps the project stay presentable even if MySQL is temporarily unavailable.
+- The main working application uses the `securemeal` database.
+- The advanced DBMS showcase SQL creates `securemeal_enterprise`.
+- Demo fallback mode helps the project stay presentation-ready even if MySQL is temporarily unavailable.
