@@ -122,7 +122,8 @@ const AdminDashboard = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Feedback ID</th>
+                <th>Student ID</th>
                 <th>Student</th>
                 <th>Dept</th>
                 <th>Rating</th>
@@ -133,6 +134,7 @@ const AdminDashboard = () => {
               {feedbackRows.map((row) => (
                 <tr key={row.feed_id}>
                   <td>{row.feed_id}</td>
+                  <td>{row.student_id}</td>
                   <td>{row.name}</td>
                   <td>{row.dept}</td>
                   <td>{row.rating}</td>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { localDemoStudents } from '../demoData';
 import api from '../services/api';
@@ -15,6 +15,22 @@ const Register = () => {
   const [success, setSuccess] = useState('');
   const [studentId, setStudentId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [recentStudents, setRecentStudents] = useState(localDemoStudents);
+
+  const loadRecentStudents = async () => {
+    try {
+      const { data } = await api.get('/student/all');
+      if (Array.isArray(data.students) && data.students.length > 0) {
+        setRecentStudents(data.students.slice(0, 8));
+      }
+    } catch (err) {
+      console.error('Failed to load recent students', err);
+    }
+  };
+
+  useEffect(() => {
+    loadRecentStudents();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -39,6 +55,7 @@ const Register = () => {
         phone: '',
         plan_type: 'regular',
       });
+      await loadRecentStudents();
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -70,12 +87,12 @@ const Register = () => {
         </form>
 
         <aside className="auth-card demo-card">
-          <h2>Existing Demo Students</h2>
+          <h2>Recent Students</h2>
           <p className="helper-text">
-            These sample students are already available for quick login and easier live demonstration.
+            Newly added students appear here so you can quickly verify registration and use them for login.
           </p>
           <div className="demo-list">
-            {localDemoStudents.map((student) => (
+            {recentStudents.map((student) => (
               <div key={student.student_id} className="demo-item demo-item-static">
                 <strong>{student.name}</strong>
                 <span>ID: {student.student_id}</span>

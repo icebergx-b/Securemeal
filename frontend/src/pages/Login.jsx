@@ -15,31 +15,47 @@ const Login = () => {
     student_id: '',
   });
   const [error, setError] = useState('');
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
+  const [createdStudentId, setCreatedStudentId] = useState('');
+  const [registerLoading, setRegisterLoading] = useState(false);
   const [demoStudents, setDemoStudents] = useState(localDemoStudents);
   const [demoAdmins, setDemoAdmins] = useState(localDemoAdmins);
+  const [quickStudentForm, setQuickStudentForm] = useState({
+    name: '',
+    dept: '',
+    room_no: '',
+    phone: '',
+    plan_type: 'regular',
+  });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadDemoAccounts = async () => {
-      try {
-        const { data } = await api.get('/student/all');
-        if (Array.isArray(data.students) && data.students.length > 0) {
-          setDemoStudents(data.students.slice(0, 6));
-        }
-        if (Array.isArray(data.demo_admins) && data.demo_admins.length > 0) {
-          setDemoAdmins(data.demo_admins);
-        }
-      } catch (err) {
-        console.error('Failed to load demo accounts', err);
+  const loadStudents = async () => {
+    try {
+      const { data } = await api.get('/student/all');
+      if (Array.isArray(data.students) && data.students.length > 0) {
+        setDemoStudents(data.students.slice(0, 8));
       }
-    };
+      if (Array.isArray(data.demo_admins) && data.demo_admins.length > 0) {
+        setDemoAdmins(data.demo_admins);
+      }
+    } catch (err) {
+      console.error('Failed to load student sidebar data', err);
+    }
+  };
 
-    loadDemoAccounts();
+  useEffect(() => {
+    loadStudents();
   }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleQuickStudentChange = (event) => {
+    const { name, value } = event.target;
+    setQuickStudentForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (event) => {
@@ -71,6 +87,38 @@ const Login = () => {
       role,
       student_id: student_id ? String(student_id) : '',
     });
+  };
+
+  const handleQuickRegister = async (event) => {
+    event.preventDefault();
+    setRegisterError('');
+    setRegisterSuccess('');
+    setCreatedStudentId('');
+    setRegisterLoading(true);
+
+    try {
+      const { data } = await api.post('/student/register', quickStudentForm);
+      const studentId = String(data.student_id || '');
+      setRegisterSuccess(data.message || 'Student registered successfully');
+      setCreatedStudentId(studentId);
+      setQuickStudentForm({
+        name: '',
+        dept: '',
+        room_no: '',
+        phone: '',
+        plan_type: 'regular',
+      });
+      setFormData({
+        name: quickStudentForm.name,
+        role: 'student',
+        student_id: studentId,
+      });
+      await loadStudents();
+    } catch (err) {
+      setRegisterError(err.response?.data?.message || 'Failed to register student');
+    } finally {
+      setRegisterLoading(false);
+    }
   };
 
   return (
@@ -122,13 +170,13 @@ const Login = () => {
         </form>
 
         <aside className="auth-card demo-card">
-          <h2>Ready Demo Accounts</h2>
+          <h2>Recent Students</h2>
           <p className="helper-text">
-            Use these sample entries so you do not need to remember names, IDs, rooms, or plan details.
+            Use the latest students directly from the sidebar so you do not need to remember names, IDs, rooms, or plan details.
           </p>
 
           <div className="demo-section">
-            <h3>Students</h3>
+            <h3>Login from sidebar</h3>
             <div className="demo-list">
               {demoStudents.map((student) => (
                 <button
@@ -150,6 +198,63 @@ const Login = () => {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="demo-section">
+            <h3>Quick Add Student</h3>
+            <form className="compact-form" onSubmit={handleQuickRegister}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Student name"
+                value={quickStudentForm.name}
+                onChange={handleQuickStudentChange}
+                required
+              />
+              <input
+                type="text"
+                name="dept"
+                placeholder="Department"
+                value={quickStudentForm.dept}
+                onChange={handleQuickStudentChange}
+                required
+              />
+              <input
+                type="text"
+                name="room_no"
+                placeholder="Room number"
+                value={quickStudentForm.room_no}
+                onChange={handleQuickStudentChange}
+                required
+              />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone"
+                value={quickStudentForm.phone}
+                onChange={handleQuickStudentChange}
+                required
+              />
+              <select
+                name="plan_type"
+                value={quickStudentForm.plan_type}
+                onChange={handleQuickStudentChange}
+              >
+                <option value="regular">Regular</option>
+                <option value="veg">Veg</option>
+                <option value="special">Special</option>
+              </select>
+              {registerError && <p className="error-text">{registerError}</p>}
+              {registerSuccess && <p className="success-text">{registerSuccess}</p>}
+              {createdStudentId && (
+                <p className="success-text">
+                  Added student ID: {createdStudentId}. The login form is prefilled above.
+                </p>
+              )}
+              <button type="submit" className="btn btn-wide" disabled={registerLoading}>
+                {registerLoading ? 'Adding...' : 'Add Student'}
+              </button>
+            </form>
           </div>
 
           <div className="demo-section">

@@ -86,9 +86,9 @@ const markAttendance = async (req, res, next) => {
 };
 
 const getAttendanceByStudent = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
+  try {
     const detailQuery = `
       SELECT
         a.att_id,
