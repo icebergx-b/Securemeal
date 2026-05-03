@@ -86,6 +86,7 @@ const DatabaseLab = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [explainEnabled, setExplainEnabled] = useState(false);
 
   const loadOverview = async () => {
     try {
@@ -118,7 +119,8 @@ const DatabaseLab = () => {
     setMessage('');
 
     try {
-      const payload = { query: nextQuery || query, explain };
+      const isExplain = explain || explainEnabled;
+      const payload = { query: nextQuery || query, explain: isExplain };
       const { data } = await api.post('/lab/playground', payload);
       setResult({
         columns: data.columns || [],
@@ -126,7 +128,7 @@ const DatabaseLab = () => {
         duration_ms: data.duration_ms || 0,
         mode: data.mode || 'database',
       });
-      setMessage(explain ? 'Execution plan loaded successfully.' : 'Query executed successfully.');
+      setMessage(isExplain ? 'Execution plan loaded successfully.' : 'Query executed successfully.');
       loadLogs();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to execute query');
@@ -231,9 +233,14 @@ const DatabaseLab = () => {
               <button className="btn" type="button" disabled={loading} onClick={() => runQuery()}>
                 {loading ? 'Running...' : 'Run Query'}
               </button>
-              <button className="btn btn-admin" type="button" disabled={loading} onClick={() => runQuery({ explain: true })}>
-                Explain Query
-              </button>
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={explainEnabled}
+                  onChange={(e) => setExplainEnabled(e.target.checked)}
+                />
+                <span>Enable EXPLAIN Mode</span>
+              </label>
             </div>
             {message && <p className="success-text">{message}</p>}
             {error && <p className="error-text">{error}</p>}

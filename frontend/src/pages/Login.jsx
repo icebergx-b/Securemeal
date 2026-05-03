@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { localDemoAdmins, localDemoStudents } from '../demoData';
 import api from '../services/api';
 
 const roleRouteMap = {
@@ -10,115 +9,84 @@ const roleRouteMap = {
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    name: '',
     role: 'student',
     student_id: '',
+    password: '',
+    name: '',
   });
   const [error, setError] = useState('');
-  const [registerError, setRegisterError] = useState('');
-  const [registerSuccess, setRegisterSuccess] = useState('');
-  const [createdStudentId, setCreatedStudentId] = useState('');
-  const [registerLoading, setRegisterLoading] = useState(false);
-  const [demoStudents, setDemoStudents] = useState(localDemoStudents);
-  const [demoAdmins, setDemoAdmins] = useState(localDemoAdmins);
-  const [quickStudentForm, setQuickStudentForm] = useState({
-    name: '',
-    dept: '',
-    room_no: '',
-    phone: '',
-    plan_type: 'regular',
-  });
+  const [studentOptions, setStudentOptions] = useState([]);
+  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [studentLoading, setStudentLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (selectorOpen && studentOptions.length === 0) {
+      loadStudents();
+    }
+  }, [selectorOpen, studentOptions.length]);
+
   const loadStudents = async () => {
+    setStudentLoading(true);
+    setError('');
     try {
-      const { data } = await api.get('/student/all');
-      if (Array.isArray(data.students) && data.students.length > 0) {
-        setDemoStudents(data.students.slice(0, 8));
-      }
-      if (Array.isArray(data.demo_admins) && data.demo_admins.length > 0) {
-        setDemoAdmins(data.demo_admins);
-      }
+      const { data } = await api.get('/auth/students');
+      setStudentOptions(data.students || []);
     } catch (err) {
-      console.error('Failed to load student sidebar data', err);
+      setError(err.response?.data?.error || 'Failed to load registered students');
+    } finally {
+      setStudentLoading(false);
     }
   };
-
-  useEffect(() => {
-    loadStudents();
-  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleQuickStudentChange = (event) => {
-    const { name, value } = event.target;
-    setQuickStudentForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
-
-    if (!formData.name) {
-      setError('Name is required');
-      return;
-    }
 
     if (formData.role === 'student' && !formData.student_id) {
-      setError('Student ID is required for student login');
+      setError('Please select a registered student first');
       return;
     }
 
-    localStorage.setItem('token', 'session-active');
-    localStorage.setItem('role', formData.role);
-    localStorage.setItem('name', formData.name);
-    localStorage.setItem('student_id', formData.student_id || '');
+    if (formData.role === 'student' && !formData.password) {
+      setError('Password is required');
+      return;
+    }
 
-    navigate(roleRouteMap[formData.role]);
-  };
-
-  const applyDemoLogin = ({ name, role, student_id }) => {
-    setError('');
-    setFormData({
-      name,
-      role,
-      student_id: student_id ? String(student_id) : '',
-    });
-  };
-
-  const handleQuickRegister = async (event) => {
-    event.preventDefault();
-    setRegisterError('');
-    setRegisterSuccess('');
-    setCreatedStudentId('');
-    setRegisterLoading(true);
+    if (formData.role === 'admin' && !formData.name) {
+      setError('Admin name is required');
+      return;
+    }
 
     try {
-      const { data } = await api.post('/student/register', quickStudentForm);
-      const studentId = String(data.student_id || '');
-      setRegisterSuccess(data.message || 'Student registered successfully');
-      setCreatedStudentId(studentId);
-      setQuickStudentForm({
-        name: '',
-        dept: '',
-        room_no: '',
-        phone: '',
-        plan_type: 'regular',
-      });
-      setFormData({
-        name: quickStudentForm.name,
-        role: 'student',
-        student_id: studentId,
-      });
-      await loadStudents();
+      const { data } = await api.post('/auth/login', formData);
+      const user = data.user || {};
+
+      localStorage.setItem('token', data.token || 'session-active');
+      localStorage.setItem('role', user.role || formData.role);
+      localStorage.setItem('name', user.name || formData.name);
+      localStorage.setItem('student_id', String(user.student_id || formData.student_id || ''));
+
+      navigate(roleRouteMap[user.role || formData.role]);
     } catch (err) {
-      setRegisterError(err.response?.data?.message || 'Failed to register student');
-    } finally {
-      setRegisterLoading(false);
+      setError(err.response?.data?.error || 'Login failed');
     }
+  };
+
+  const applyStudentSelection = (student) => {
+    setError('');
+    setFormData({
+      role: 'student',
+      student_id: String(student.student_id),
+      password: '',
+      name: student.name,
+    });
+    setSelectorOpen(false);
   };
 
   return (
@@ -127,32 +95,68 @@ const Login = () => {
         <form className="auth-card" onSubmit={handleSubmit}>
           <div className="mission-banner">
             <p className="mission-tag">Hostel Mess Management System</p>
-            <h1>Student Mess Operations Portal</h1>
+            <h1>Welcome Back to the Mess Hall</h1>
             <p className="mission-text">
-              Manage menu, attendance, and feedback in one centralized DBMS system.
+              Secure student login, auto-marked attendance, and a delicious weekly menu in one place.
+            </p>
+            <p className="mission-quote">
+              Fresh meals, smooth attendance, and a vibrant dining experience for every hostel day.
             </p>
           </div>
-
-          <input
-            type="text"
-            name="name"
-            placeholder="Your name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
 
           <select name="role" value={formData.role} onChange={handleChange}>
             <option value="student">Student</option>
             <option value="admin">Admin</option>
           </select>
 
-          {formData.role === 'student' && (
+          {formData.role === 'student' ? (
+            <>
+              <button
+                type="button"
+                className="btn btn-selector"
+                onClick={() => setSelectorOpen((prev) => !prev)}
+              >
+                {formData.name ? `Selected: ${formData.name}` : 'Select Registered Student'}
+              </button>
+
+              {selectorOpen && (
+                <div className="student-selector-panel">
+                  {studentLoading ? (
+                    <div className="selector-skeleton shimmer" />
+                  ) : (
+                    <div className="selector-grid">
+                      {studentOptions.map((student) => (
+                        <button
+                          key={student.student_id}
+                          type="button"
+                          className="selector-student-card"
+                          onClick={() => applyStudentSelection(student)}
+                        >
+                          <strong>{student.name}</strong>
+                          <span>ID: {student.student_id}</span>
+                          <span>{student.dept} • Room {student.room_no}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </>
+          ) : (
             <input
-              type="number"
-              name="student_id"
-              placeholder="Student ID"
-              value={formData.student_id}
+              type="text"
+              name="name"
+              placeholder="Admin name"
+              value={formData.name}
               onChange={handleChange}
               required
             />
@@ -169,110 +173,41 @@ const Login = () => {
           </p>
         </form>
 
-        <aside className="auth-card demo-card">
-          <h2>Recent Students</h2>
-          <p className="helper-text">
-            Use the latest students directly from the sidebar so you do not need to remember names, IDs, rooms, or plan details.
-          </p>
-
-          <div className="demo-section">
-            <h3>Login from sidebar</h3>
-            <div className="demo-list">
-              {demoStudents.map((student) => (
-                <button
-                  key={student.student_id}
-                  type="button"
-                  className="demo-item"
-                  onClick={() =>
-                    applyDemoLogin({
-                      name: student.name,
-                      role: 'student',
-                      student_id: student.student_id,
-                    })
-                  }
-                >
-                  <strong>{student.name}</strong>
-                  <span>ID: {student.student_id}</span>
-                  <span>{student.dept} • Room {student.room_no}</span>
-                  <span>{student.plan_type} plan</span>
-                </button>
-              ))}
-            </div>
+        <aside className="auth-card demo-card login-illustration-card">
+          <div className="food-illustration-cloud food-illustration-cloud-top" />
+          <div className="food-illustration-cloud food-illustration-cloud-bottom" />
+          <div className="login-hero-copy">
+            <p className="mission-tag">Deliciously Organized</p>
+            <h2>Today's mess feels like a premium food app.</h2>
+            <p className="helper-text">
+              Warm menus, instant attendance, and student-specific access built on live MySQL tables.
+            </p>
           </div>
-
-          <div className="demo-section">
-            <h3>Quick Add Student</h3>
-            <form className="compact-form" onSubmit={handleQuickRegister}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Student name"
-                value={quickStudentForm.name}
-                onChange={handleQuickStudentChange}
-                required
-              />
-              <input
-                type="text"
-                name="dept"
-                placeholder="Department"
-                value={quickStudentForm.dept}
-                onChange={handleQuickStudentChange}
-                required
-              />
-              <input
-                type="text"
-                name="room_no"
-                placeholder="Room number"
-                value={quickStudentForm.room_no}
-                onChange={handleQuickStudentChange}
-                required
-              />
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone"
-                value={quickStudentForm.phone}
-                onChange={handleQuickStudentChange}
-                required
-              />
-              <select
-                name="plan_type"
-                value={quickStudentForm.plan_type}
-                onChange={handleQuickStudentChange}
-              >
-                <option value="regular">Regular</option>
-                <option value="veg">Veg</option>
-                <option value="special">Special</option>
-              </select>
-              {registerError && <p className="error-text">{registerError}</p>}
-              {registerSuccess && <p className="success-text">{registerSuccess}</p>}
-              {createdStudentId && (
-                <p className="success-text">
-                  Added student ID: {createdStudentId}. The login form is prefilled above.
-                </p>
-              )}
-              <button type="submit" className="btn btn-wide" disabled={registerLoading}>
-                {registerLoading ? 'Adding...' : 'Add Student'}
-              </button>
-            </form>
+          <div className="plate-scene floating-scene" aria-hidden="true">
+            <svg viewBox="0 0 420 280" className="plate-svg">
+              <defs>
+                <linearGradient id="sunrise" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f97316" />
+                  <stop offset="50%" stopColor="#facc15" />
+                  <stop offset="100%" stopColor="#ef4444" />
+                </linearGradient>
+              </defs>
+              <circle cx="340" cy="52" r="28" fill="#fde68a" />
+              <ellipse cx="210" cy="186" rx="136" ry="70" fill="#fff7ed" stroke="#fdba74" strokeWidth="8" />
+              <ellipse cx="210" cy="186" rx="92" ry="44" fill="#fef3c7" />
+              <path d="M162 165c15-24 40-32 71-28 25 3 42 16 57 34-27 15-54 22-81 19-25-2-42-10-47-25z" fill="url(#sunrise)" />
+              <circle cx="170" cy="158" r="16" fill="#16a34a" />
+              <circle cx="262" cy="170" r="14" fill="#22c55e" />
+              <circle cx="216" cy="153" r="11" fill="#fef08a" />
+              <path d="M114 214c36 15 158 15 194-2" fill="none" stroke="#fb923c" strokeWidth="7" strokeLinecap="round" />
+              <path d="M96 92c22-18 48-22 68-12" fill="none" stroke="#fdba74" strokeWidth="6" strokeLinecap="round" />
+              <path d="M286 88c20-8 40-4 58 11" fill="none" stroke="#fdba74" strokeWidth="6" strokeLinecap="round" />
+            </svg>
           </div>
-
-          <div className="demo-section">
-            <h3>Admin</h3>
-            <div className="demo-list">
-              {demoAdmins.map((admin) => (
-                <button
-                  key={admin.name}
-                  type="button"
-                  className="demo-item"
-                  onClick={() => applyDemoLogin({ name: admin.name, role: 'admin' })}
-                >
-                  <strong>{admin.name}</strong>
-                  <span>Role: admin</span>
-                  <span>{admin.note}</span>
-                </button>
-              ))}
-            </div>
+          <div className="taste-notes">
+            <div className="taste-chip">Weekly breakfast, lunch, dinner menus</div>
+            <div className="taste-chip">Auto attendance on secure student login</div>
+            <div className="taste-chip">Feedback, audit logs, and live DB visibility</div>
           </div>
         </aside>
       </div>

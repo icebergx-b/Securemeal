@@ -6,6 +6,8 @@ import api from '../services/api';
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
+    password: '',
     dept: '',
     room_no: '',
     phone: '',
@@ -50,6 +52,8 @@ const Register = () => {
       setStudentId(String(data.student_id || ''));
       setFormData({
         name: '',
+        email: '',
+        password: '',
         dept: '',
         room_no: '',
         phone: '',
@@ -57,7 +61,7 @@ const Register = () => {
       });
       await loadRecentStudents();
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || err.response?.data?.error || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -69,6 +73,8 @@ const Register = () => {
         <form className="auth-card" onSubmit={handleSubmit}>
           <h1>Student Registration</h1>
           <input type="text" name="name" placeholder="Student name" value={formData.name} onChange={handleChange} required />
+          <input type="email" name="email" placeholder="Email address" value={formData.email} onChange={handleChange} required />
+          <input type="password" name="password" placeholder="Create password" value={formData.password} onChange={handleChange} required />
           <input type="text" name="dept" placeholder="Department" value={formData.dept} onChange={handleChange} required />
           <input type="text" name="room_no" placeholder="Room number" value={formData.room_no} onChange={handleChange} required />
           <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} required />
@@ -86,18 +92,26 @@ const Register = () => {
           <p className="helper-text">Already registered? <Link to="/login">Go to login</Link></p>
         </form>
 
-        <aside className="auth-card demo-card">
-          <h2>Recent Students</h2>
-          <p className="helper-text">
-            Newly added students appear here so you can quickly verify registration and use them for login.
-          </p>
+        <aside className="auth-card demo-card login-illustration-card">
+          <div className="login-hero-copy">
+            <p className="mission-tag">Fresh Enrolment</p>
+            <h2>Create a secure student account for mess access.</h2>
+            <p className="helper-text">
+              Every newly registered student lands directly in MySQL with live visibility in SQL Workbench.
+            </p>
+          </div>
+          <div className="taste-notes">
+            <div className="taste-chip">Unique password per student</div>
+            <div className="taste-chip">Dynamic menu + attendance dashboards</div>
+            <div className="taste-chip">Immediate database updates for lab demos</div>
+          </div>
           <div className="demo-list">
             {recentStudents.map((student) => (
               <div key={student.student_id} className="demo-item demo-item-static">
                 <strong>{student.name}</strong>
                 <span>ID: {student.student_id}</span>
+                <span>{student.email || 'Email stored in database'}</span>
                 <span>{student.dept} • Room {student.room_no}</span>
-                <span>{student.phone} • {student.plan_type} plan</span>
               </div>
             ))}
           </div>

@@ -6,10 +6,14 @@ const attendanceRoutes = require('./attendanceRoutes');
 const feedbackRoutes = require('./feedbackRoutes');
 const staffRoutes = require('./staffRoutes');
 const labRoutes = require('./labRoutes');
+const authRoutes = require('./authRoutes');
+const adminRoutes = require('./adminRoutes');
 
 const router = express.Router();
 
 router.get('/health', healthCheck);
+router.use('/auth', authRoutes);
+router.use('/admin', adminRoutes);
 router.use('/student', studentRoutes);
 router.use('/menu', menuRoutes);
 router.use('/attendance', attendanceRoutes);

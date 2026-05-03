@@ -15,6 +15,7 @@ const PROCEDURE_WHITELIST = new Set([
   'inventory_forecast',
   'detect_irregular_attendance',
   'iterate_students_generate_report',
+  'get_login_history',
 ]);
 
 const PREBUILT_QUERIES = {
@@ -111,6 +112,55 @@ const PREBUILT_QUERIES = {
       GROUP BY s.student_id, s.name, s.dept, s.room_no, mp.plan_type
       ORDER BY s.student_id
     `,
+  },
+  live_login_log: {
+    id: 'live_login_log',
+    title: 'Live Login Log',
+    description: 'Real-time security audit of student and admin access attempts.',
+    chart: 'table',
+    query: 'SELECT * FROM Login_Log ORDER BY login_time DESC LIMIT 50;',
+  },
+  trigger_log: {
+    id: 'trigger_log',
+    title: 'Trigger Log',
+    description: 'Entries auto-created by MySQL triggers for registrations and logins.',
+    chart: 'table',
+    query: 'SELECT * FROM TRIGGER_LOG ORDER BY fired_at DESC LIMIT 50;',
+  },
+  meal_summary_view: {
+    id: 'meal_summary_view',
+    title: 'Student Meal Summary (VIEW)',
+    description: 'Data fetched from the student_meal_summary MySQL view.',
+    chart: 'bar',
+    query: 'SELECT * FROM student_meal_summary;',
+  },
+  login_history_proc: {
+    id: 'login_history_proc',
+    title: 'Student Login History (PROC)',
+    description: 'Demo of the get_login_history stored procedure for student 101.',
+    chart: 'table',
+    query: 'CALL get_login_history(101);',
+  },
+  attendance_rate_today: {
+    id: 'attendance_rate_today',
+    title: "Today's Attendance Rate",
+    description: 'Calculates the percentage of present marks for the current date.',
+    chart: 'line',
+    query: "SELECT ROUND(SUM(status='present') / COUNT(*) * 100, 1) AS attendance_pct FROM ATTENDANCE WHERE date_val = CURDATE();",
+  },
+  show_triggers: {
+    id: 'show_triggers',
+    title: 'Show All Triggers',
+    description: 'Database metadata query to list all active triggers.',
+    chart: 'table',
+    query: 'SHOW TRIGGERS;',
+  },
+  show_views: {
+    id: 'show_views',
+    title: 'Show All Views',
+    description: 'Database metadata query to list all views in the schema.',
+    chart: 'table',
+    query: "SHOW FULL TABLES WHERE Table_type = 'VIEW';",
   },
 };
 

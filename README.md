@@ -115,7 +115,7 @@ SecureMeal/
 ### 1. Start the backend
 
 ```bash
-cd /Users/priyanshupanda/Documents/Motivss/SecureMeal/backend
+cd ./backend
 npm install
 node server.js
 ```
@@ -129,7 +129,7 @@ http://localhost:5000
 ### 2. Start the frontend
 
 ```bash
-cd /Users/priyanshupanda/Documents/Motivss/SecureMeal/frontend
+cd ./frontend
 npm install
 npm run dev
 ```
@@ -156,6 +156,7 @@ DB_HOST=127.0.0.1
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=securemeal
+DEMO_MODE=false
 ```
 
 ## Demo Login
@@ -217,7 +218,7 @@ mysql -u root -p
 Then inside MySQL:
 
 ```sql
-SOURCE /Users/priyanshupanda/Documents/Motivss/SecureMeal/backend/sql/enterprise_blueprint.sql;
+SOURCE ./backend/sql/enterprise_blueprint.sql;
 ```
 
 This creates a separate showcase database:
@@ -256,7 +257,7 @@ curl http://localhost:5000/api/menu
 Run migrations:
 
 ```bash
-cd /Users/priyanshupanda/Documents/Motivss/SecureMeal/backend
+cd ./backend
 npm run migrate
 ```
 
@@ -265,7 +266,7 @@ npm run migrate
 Whenever you change the project:
 
 ```bash
-cd /Users/priyanshupanda/Documents/Motivss/SecureMeal
+cd .
 git status
 git add .
 git commit -m "Describe your changes"

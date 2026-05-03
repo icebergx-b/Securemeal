@@ -1,14 +1,6 @@
 const db = require('../db');
 const demoStore = require('../demoStore');
-
-const isDatabaseUnavailable = (error) => {
-  return [
-    'ECONNREFUSED',
-    'ENOTFOUND',
-    'ETIMEDOUT',
-    'PROTOCOL_CONNECTION_LOST',
-  ].includes(error?.code);
-};
+const { shouldUseDemoFallback } = require('../utils/runtimeMode');
 
 const addFeedback = async (req, res, next) => {
   const { student_id, rating, comments } = req.body;
@@ -59,7 +51,7 @@ const addFeedback = async (req, res, next) => {
       feed_id: result.insertId,
     });
   } catch (error) {
-    if (!isDatabaseUnavailable(error)) {
+    if (!shouldUseDemoFallback(error)) {
       return next(error);
     }
 
@@ -103,7 +95,7 @@ const getAllFeedback = async (req, res, next) => {
 
     return res.status(200).json({ success: true, feedback: rows });
   } catch (error) {
-    if (!isDatabaseUnavailable(error)) {
+    if (!shouldUseDemoFallback(error)) {
       return next(error);
     }
 

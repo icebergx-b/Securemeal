@@ -1,24 +1,26 @@
 const db = require('../db');
 const demoStore = require('../demoStore');
-
-const isDatabaseUnavailable = (error) => {
-  return [
-    'ECONNREFUSED',
-    'ENOTFOUND',
-    'ETIMEDOUT',
-    'PROTOCOL_CONNECTION_LOST',
-  ].includes(error?.code);
-};
+const { shouldUseDemoFallback } = require('../utils/runtimeMode');
 
 const getMenu = async (req, res, next) => {
   try {
+    const normalizedDay = String(req.query.day || '').trim();
     const [rows] = await db.execute(
-      'SELECT menu_id, day, meal_type, food_items FROM MENU ORDER BY menu_id DESC'
+      normalizedDay
+        ? `SELECT menu_id, day, meal_type, food_items
+           FROM MENU
+           WHERE day = ?
+           ORDER BY FIELD(meal_type, 'breakfast', 'lunch', 'dinner')`
+        : `SELECT menu_id, day, meal_type, food_items
+           FROM MENU
+           ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
+                    FIELD(meal_type, 'breakfast', 'lunch', 'dinner')`,
+      normalizedDay ? [normalizedDay] : []
     );
 
     return res.status(200).json({ success: true, menu: rows });
   } catch (error) {
-    if (!isDatabaseUnavailable(error)) {
+    if (!shouldUseDemoFallback(error)) {
       return next(error);
     }
 
@@ -38,17 +40,19 @@ const addMenu = async (req, res, next) => {
     }
 
     const [result] = await db.execute(
-      'INSERT INTO MENU (day, meal_type, food_items) VALUES (?, ?, ?)',
+      `INSERT INTO MENU (day, meal_type, food_items)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE food_items = VALUES(food_items), menu_id = LAST_INSERT_ID(menu_id)`,
       [day, meal_type, food_items]
     );
 
     return res.status(201).json({
       success: true,
-      message: 'Menu added successfully',
+      message: 'Menu saved successfully',
       menu_id: result.insertId,
     });
   } catch (error) {
-    if (!isDatabaseUnavailable(error)) {
+    if (!shouldUseDemoFallback(error)) {
       return next(error);
     }
 
